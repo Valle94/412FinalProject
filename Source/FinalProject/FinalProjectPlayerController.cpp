@@ -31,6 +31,12 @@ void AFinalProjectPlayerController::BeginPlay()
 		}
 
 	}
+
+	HUDWidget = CreateWidget<UHUDWidget>(this, HUDWidgetClass);
+	if (HUDWidget)
+	{
+		HUDWidget->AddToViewport();
+	}
 }
 
 void AFinalProjectPlayerController::SetupInputComponent()

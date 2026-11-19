@@ -50,6 +50,24 @@ AFinalProjectCharacter::AFinalProjectCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void AFinalProjectCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OnTakeAnyDamage.AddDynamic(this, &AFinalProjectCharacter::OnDamageTaken);
+	Health = MaxHealth;
+
+	GetMesh()->HideBoneByName("weapon_r", EPhysBodyOp::PBO_None);
+
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	if (Gun)
+	{
+		Gun->SetOwner(this);
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Gun->OwnerController = GetController();
+	}
+}
+
 void AFinalProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -65,6 +83,10 @@ void AFinalProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFinalProjectCharacter::Look);
+
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFinalProjectCharacter::Shoot);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &AFinalProjectCharacter::Reload);
+
 	}
 	else
 	{
@@ -130,4 +152,35 @@ void AFinalProjectCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AFinalProjectCharacter::Shoot()
+{
+	if (Gun)
+		Gun->PullTrigger();
+}
+
+void AFinalProjectCharacter::Reload()
+{
+	if (Gun)
+		Gun->ReloadGun();
+}
+
+void AFinalProjectCharacter::OnDamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (IsAlive)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Damage Taken: %f"), Damage);
+		
+		Health -= Damage;
+		if (Health <= 0.0f )
+		{
+			IsAlive = false;
+			Health = 0.0f;
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+			UE_LOG(LogTemp, Display, TEXT("Character Died: %s"), *GetActorNameOrLabel());
+		}
+	}
 }

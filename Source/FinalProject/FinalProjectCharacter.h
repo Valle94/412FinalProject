@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
+#include "Gun.h"
+
 #include "FinalProjectCharacter.generated.h"
 
 class USpringArmComponent;
@@ -49,12 +52,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ReloadAction;
+
 public:
 
 	/** Constructor */
 	AFinalProjectCharacter();	
 
 protected:
+	virtual void BeginPlay() override;
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -92,5 +102,26 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	void Shoot();
+
+	void Reload();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AGun> GunClass;
+
+	UPROPERTY(EditAnywhere)
+	float MaxHealth = 100.0f;
+
+	float Health;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsAlive = true;
+
+	AGun* Gun;
+
+	UFUNCTION()
+	void OnDamageTaken(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, 
+		class AController* InstigatedBy, AActor* DamageCauser);
 };
 
