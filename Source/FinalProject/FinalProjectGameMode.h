@@ -18,6 +18,9 @@ public:
 	
 	/** Constructor */
 	AFinalProjectGameMode();
+
+protected:
+	virtual void BeginPlay() override;
 };
 
 
