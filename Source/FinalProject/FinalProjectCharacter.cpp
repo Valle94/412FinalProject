@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "FinalProject.h"
 
+#include "FinalProjectPlayerController.h"
+
 AFinalProjectCharacter::AFinalProjectCharacter()
 {
 	// Set size for collision capsule
@@ -56,6 +58,7 @@ void AFinalProjectCharacter::BeginPlay()
 
 	OnTakeAnyDamage.AddDynamic(this, &AFinalProjectCharacter::OnDamageTaken);
 	Health = MaxHealth;
+	UpdateHUD();
 
 	GetMesh()->HideBoneByName("weapon_r", EPhysBodyOp::PBO_None);
 
@@ -166,6 +169,17 @@ void AFinalProjectCharacter::Reload()
 		Gun->ReloadGun();
 }
 
+void AFinalProjectCharacter::UpdateHUD()
+{
+	AFinalProjectPlayerController* PlayerController = Cast<AFinalProjectPlayerController>(GetController());
+	if (PlayerController)
+	{
+		float NewPercent = Health / MaxHealth;
+		if (NewPercent < 0.0f) NewPercent = 0.0f;
+		PlayerController->HUDWidget->SetHealthBarPercent(NewPercent);
+	}
+}
+
 void AFinalProjectCharacter::OnDamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (IsAlive)
@@ -173,14 +187,18 @@ void AFinalProjectCharacter::OnDamageTaken(AActor* DamagedActor, float Damage, c
 		UE_LOG(LogTemp, Display, TEXT("Damage Taken: %f"), Damage);
 		
 		Health -= Damage;
+		UpdateHUD();
+
 		if (Health <= 0.0f )
 		{
 			IsAlive = false;
 			Health = 0.0f;
 
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			DetachFromControllerPendingDestroy();
 
 			UE_LOG(LogTemp, Display, TEXT("Character Died: %s"), *GetActorNameOrLabel());
 		}
+
 	}
 }

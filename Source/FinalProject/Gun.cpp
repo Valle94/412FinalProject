@@ -42,6 +42,7 @@ void AGun::PullTrigger()
 	if (Ammo > 0 )
 	{
 		MuzzleFlashParticleSystem->Activate(true);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
 
 		if (OwnerController)
 		{
@@ -61,6 +62,8 @@ void AGun::PullTrigger()
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactParticleSystem,
 					HitResult.ImpactPoint, HitResult.ImpactPoint.Rotation());
 
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, HitResult.ImpactPoint);
+
 				AActor* HitActor = HitResult.GetActor();
 				if (HitActor)
 				{
@@ -78,6 +81,7 @@ void AGun::PullTrigger()
 void AGun::ReloadGun()
 {
 	Ammo = MaxAmmo;
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), ReloadSound, GetActorLocation());
 	UE_LOG(LogTemp, Display, TEXT("Gun Reloaded; Current Ammo: %i"), Ammo);
 }
 

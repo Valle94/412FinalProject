@@ -15,7 +15,8 @@ void AShooterAI::BeginPlay()
 
 void AShooterAI::Tick(float DeltaTime)
 {
-	//Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);
+	
 	//APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	//if (PlayerPawn)
 	//{
@@ -48,8 +49,7 @@ void AShooterAI::StartBehaviorTree(AFinalProjectCharacter* Player)
 		UBlackboardComponent* MyBlackboard = GetBlackboardComponent();
 		if (MyBlackboard && PlayerCharacter && MyCharacter)
 		{
-			MyBlackboard->SetValueAsVector("PlayerLocation", PlayerCharacter->GetTargetLocation());
-			MyBlackboard->SetValueAsVector("StartLocation", MyCharacter->GetTargetLocation());
+			MyBlackboard->SetValueAsVector("StartLocation", MyCharacter->GetActorLocation());
 		}
 	}
 }

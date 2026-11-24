@@ -50,6 +50,15 @@ public:
 
 	int Ammo;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* ShootSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* ImpactSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* ReloadSound;
+
 	AController* OwnerController;
 
 	void PullTrigger();
